@@ -9,10 +9,7 @@
 #ifndef KDRIVER_UART_H_
 #define KDRIVER_UART_H_
 
-#include <string.h>
-#include <stdarg.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
+
 
 #ifndef F_CPU
 #warning "F_CPU is not defined for drivers/bus/mega128/uart.h"
@@ -60,15 +57,6 @@ void uart0_putc(char c);
  */
 void uart0_puts(char *msg);
 
-/*
- * UART0 custom printf - uart0_printf(char * format, ...)
- * prints a formatted string to uart0 without stdio.
- * Arguments: char * format - same as printf's format, but does
- * 			not support floats.
- * 		   arg1, arg2, ... - values, as specified in format.
- * Returns: nothing
- */
-void uart0_printf(char *format, ...);
 /*
  * UART0 receive buffer flush - rx0_buffer_flush()
  * Clears the uart0 receive buffer (rx0_buffer).
