@@ -10,7 +10,6 @@
 #include <drivers/arch/mega128/uart.h>
 #include <drivers/arch/mega128/arch.h>
 #include <string.h>
-#include <avr/iom128.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
