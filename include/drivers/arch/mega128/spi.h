@@ -59,8 +59,13 @@
 #define SPI_RX_BUFFER_SIZE 32
 #define SPI_RX_BUFFER_MASK (SPI_RX_BUFFER_SIZE - 1)
 
-#define spi_CS_LOW() SPI_PORT &= ~(1 << SPI_PIN_SS)
-#define spi_CS_HIGH() SPI_PORT |= (1 << SPI_PIN_SS)
+#define arch_SPI_CS_LOW() SPI_PORT &= ~(1 << SPI_PIN_SS)
+#define arch_SPI_CS_HIGH() SPI_PORT |= (1 << SPI_PIN_SS)
+
+#define arch_SPI_BUSY_WAIT() {while (!((*(bus->spsr)) & (1 << SPIF))){;}}
+
+#define arch_SPI_INT_ENABLE() (*(bus->spcr) |= (1 << SPIE))
+#define arch_SPI_INT_DISABLE() (*(bus->spcr) &= ~(1 << SPIE))
 
 typedef struct drvSpiStruct_t 
 {
@@ -68,25 +73,40 @@ typedef struct drvSpiStruct_t
 	drvRegister_t *spcr;
 	drvRegister_t *spsr;
 
-	char buf_rx[SPI_RX_BUFFER_SIZE];
+	uint8_t buf_rx_b[SPI_RX_BUFFER_SIZE];
 	uint8_t buf_rx_head;
 	uint8_t buf_rx_tail;
 
-	uint8_t flags;
+	uint8_t status;
+
+	uint16_t flags;
+	uint32_t speed;
 } drvSpi_t;
 
-void spi_init(drvSpi_t *bus, uint8_t num);
+extern drvSpi_t busSpi0;
 
-void spi_start(drvSpi_t *bus, uint16_t flags);
-void spi_stop(drvSpi_t *bus);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void spi_write(drvSpi_t *bus, byte data);
-byte spi_transfer(drvSpi_t *bus, byte data);
+void arch_spi_init(drvSpi_t *bus, uint8_t num);
 
-byte spi_read(drvSpi_t *bus);
-byte spi_peek(drvSpi_t *bus);
-int spi_available(drvSpi_t *bus);
+void arch_spi_start(drvSpi_t *bus);
+void arch_spi_set_mode(drvSpi_t *bus, uint16_t flags);
+void arch_spi_stop(drvSpi_t *bus);
 
-void spi_flushRX(drvSpi_t *bus);
+void arch_spi_write(drvSpi_t *bus, uint8_t data);
+uint8_t arch_spi_read(drvSpi_t *bus);
+uint8_t arch_spi_read_write(drvSpi_t *bus, uint8_t in);
+
+uint8_t arch_spi_read(drvSpi_t *bus);
+uint8_t arch_spi_peek(drvSpi_t *bus);
+uint8_t arch_spi_available(drvSpi_t *bus);
+
+void arch_spi_flushRX(drvSpi_t *bus);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* YKTS_DRIVERS_SPI_H_ */
