@@ -9,6 +9,7 @@
 #include <drivers/bus/bus.h>
 #include <drivers/bus/uart.h>
 #include <drivers/arch/arch.h>
+#include <string.h>
 #include <stdint.h>
 #include <stddef.h>
 
@@ -23,6 +24,8 @@ BusUart::BusUart(uint8_t num)
 		break;
 	case 1:
 		this->uartDriver = &busUart1;
+		break;
+	default:
 		break;
 	}
 		

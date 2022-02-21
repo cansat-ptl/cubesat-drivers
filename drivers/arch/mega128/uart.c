@@ -116,7 +116,7 @@ void arch_uart_stop(drvUart_t *bus)
 
 void arch_uart_write(drvUart_t *bus, uint8_t in)
 {
-	uart_BUSY_WAIT();
+	arch_UART_BUSY_WAIT();
 	*(bus->udr) = in;
 	bus->status = *(bus->ucsra);
 }
@@ -128,7 +128,7 @@ uint8_t arch_uart_read(drvUart_t *bus)
 
 	if (bus->buf_rx_head != bus->buf_rx_tail) {
 		/* Calculate buffer index, wrap on overflow */
-		uart_RXINT_DISABLE();
+		arch_UART_RXINT_DISABLE();
 
 		rx_tail = (bus->buf_rx_tail + 1) & UART_RX_BUFFER_MASK;
 		bus->buf_rx_tail = rx_tail;
@@ -136,7 +136,7 @@ uint8_t arch_uart_read(drvUart_t *bus)
 		/* Get char from RX buffer */
 		data = bus->buf_rx_b[rx_tail];
 
-		uart_RXINT_ENABLE();
+		arch_UART_RXINT_ENABLE();
 	}
 
 	return data;
@@ -146,13 +146,13 @@ uint8_t arch_uart_read_write(drvUart_t *bus, uint8_t in)
 {
 	uint8_t data = 0;
 
-	uart_RXINT_DISABLE();
+	arch_UART_RXINT_DISABLE();
 
 	arch_uart_write(bus, in);
-	uart_BUSY_WAIT();
+	arch_UART_BUSY_WAIT();
 	data = *(bus->udr);
 
-	uart_RXINT_ENABLE();
+	arch_UART_RXINT_ENABLE();
 
 	return data;
 }
@@ -163,7 +163,7 @@ uint8_t arch_uart_peek(drvUart_t *bus)
 	uint8_t data = '\0';
 
 	if (bus->buf_rx_head != bus->buf_rx_tail) {
-		uart_RXINT_DISABLE();
+		arch_UART_RXINT_DISABLE();
 
 		/* Calculate buffer index, wrap on overflow */
 		rx_tail = (bus->buf_rx_tail + 1) & UART_RX_BUFFER_MASK;
@@ -172,7 +172,7 @@ uint8_t arch_uart_peek(drvUart_t *bus)
 		/* Get char from RX buffer */
 		data = bus->buf_rx_b[rx_tail];
 
-		uart_RXINT_ENABLE();
+		arch_UART_RXINT_ENABLE();
 	}
 
 	return data;

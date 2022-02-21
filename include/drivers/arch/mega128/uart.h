@@ -63,10 +63,10 @@
 #define UART_TX_BUFFER_SIZE 32
 #define UART_TX_BUFFER_MASK (UART_TX_BUFFER_SIZE - 1)
 
-#define uart_BUSY_WAIT() {while (!((*(bus->ucsra)) & (1 << UDRE))){;}}
+#define arch_UART_BUSY_WAIT() {while (!((*(bus->ucsra)) & (1 << UDRE))){;}}
 
-#define uart_RXINT_ENABLE() (*(bus->ucsrb) |= (1 << RXCIE))
-#define uart_RXINT_DISABLE() (*(bus->ucsrb) &= ~(1 << RXCIE))
+#define arch_UART_RXINT_ENABLE() (*(bus->ucsrb) |= (1 << RXCIE))
+#define arch_UART_RXINT_DISABLE() (*(bus->ucsrb) &= ~(1 << RXCIE))
 
 typedef struct drvUartStruct_t 
 {
