@@ -20,29 +20,13 @@ drvSpi_t busSpi0;
 
 void arch_spi_init(drvSpi_t *bus, uint8_t num)
 {
-	/* SPI selection & bus struct init */
-	switch (num) {
-	case 0:
-		bus->spdr = (drvRegister_t *)(&SPDR);
-		bus->spcr = (drvRegister_t *)(&SPCR);
-		bus->spsr = (drvRegister_t *)(&SPSR);
-
-		/* TODO: replace with gpio operations when the driver is ready */
-		arch_enterCriticalSection();
-		/* Setting up SPI pins - data directions to out, MISO pullup enabled */
-		SPI_DDR |= (1 << SPI_PIN_MOSI) | (1 << SPI_PIN_SCK) | (1 << SPI_PIN_SS);
-		SPI_DDR &= ~(1 << SPI_PIN_MISO);
-		SPI_PORT |= (1 << SPI_PIN_MISO) | (1 << SPI_PIN_SS);
-
-		arch_exitCriticalSection();
-		break;
-	default:
-		/* TODO: bugcheck */
-		return;
-		break;
-	}
 
 	arch_enterCriticalSection();
+	/* Setting up SPI pins - data directions to out, MISO pullup enabled */
+	SPI_DDR |= (1 << SPI_PIN_MOSI) | (1 << SPI_PIN_SCK) | (1 << SPI_PIN_SS);
+	SPI_DDR &= ~(1 << SPI_PIN_MISO);
+	SPI_PORT |= (1 << SPI_PIN_MISO) | (1 << SPI_PIN_SS);
+
 	bus->buf_rx_head = 0;
 	bus->buf_rx_tail = 0;
 	arch_exitCriticalSection();
@@ -60,29 +44,29 @@ void arch_spi_set_mode(drvSpi_t *bus, uint16_t flags)
 				| (SPI_PRESCALER_VAL(flags) << SPR0) | (1 << MSTR) | (1 << SPIE));
 
 	arch_enterCriticalSection();
-	*(bus->spcr) = spcr;
-	*(bus->spsr) = spsr;
+	SPCR = spcr;
+	SPSR = spsr;
 	arch_exitCriticalSection();
 }
 
 void arch_spi_start(drvSpi_t *bus)
 {	
 	arch_enterCriticalSection();
-	*(bus->spcr) |= (1 << SPE);
+	SPCR |= (1 << SPE);
 	arch_exitCriticalSection();
 }
 
 void arch_spi_stop(drvSpi_t *bus)
 {
 	arch_enterCriticalSection();
-	*(bus->spcr) = 0;
-	*(bus->spsr) = 0;
+	SPCR = 0;
+	SPSR = 0;
 	arch_exitCriticalSection();
 }
 
 void arch_spi_write(drvSpi_t *bus, uint8_t data)
 {
-	*(bus->spdr) = data;
+	SPDR = data;
 	arch_SPI_BUSY_WAIT();
 }
 
@@ -115,7 +99,7 @@ uint8_t arch_spi_read_write(drvSpi_t *bus, uint8_t in)
 
 	arch_spi_write(bus, in);
 	arch_SPI_BUSY_WAIT();
-	data = *(bus->spdr);
+	data = SPDR;
 
 	arch_SPI_INT_ENABLE();
 
@@ -164,7 +148,7 @@ ISR(SPI_STC_vect)
 	uint8_t data = 0;
 	uint8_t rx_head = 0;
 
-	data = *(busSpi0.spdr);
+	data = SPDR;
 
 	/* Calculate buffer index, wrap on overflow */
 	rx_head = (busSpi0.buf_rx_head + 1) & SPI_RX_BUFFER_MASK;

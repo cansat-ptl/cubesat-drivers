@@ -62,17 +62,13 @@
 #define arch_SPI_CS_LOW() SPI_PORT &= ~(1 << SPI_PIN_SS)
 #define arch_SPI_CS_HIGH() SPI_PORT |= (1 << SPI_PIN_SS)
 
-#define arch_SPI_BUSY_WAIT() {while (!((*(bus->spsr)) & (1 << SPIF))){;}}
+#define arch_SPI_BUSY_WAIT() {while (!((SPSR) & (1 << SPIF))){;}}
 
-#define arch_SPI_INT_ENABLE() (*(bus->spcr) |= (1 << SPIE))
-#define arch_SPI_INT_DISABLE() (*(bus->spcr) &= ~(1 << SPIE))
+#define arch_SPI_INT_ENABLE() (SPCR |= (1 << SPIE))
+#define arch_SPI_INT_DISABLE() (SPCR &= ~(1 << SPIE))
 
 typedef struct drvSpiStruct_t 
 {
-	drvRegister_t *spdr;
-	drvRegister_t *spcr;
-	drvRegister_t *spsr;
-
 	uint8_t buf_rx_b[SPI_RX_BUFFER_SIZE];
 	uint8_t buf_rx_head;
 	uint8_t buf_rx_tail;
