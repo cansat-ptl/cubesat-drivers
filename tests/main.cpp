@@ -3,6 +3,7 @@
  * 
  * Created: 30.03.2021 04:15:20
  * Author: ThePetrovich
+ * #нетвойне
  */
 
 
@@ -20,6 +21,8 @@ int main(void)
         Uart0.start();
 
         Uart0.puts("Hello world!\r\n");
+
+        Uart0.puts("Testing yktsat-drivers version " VERSION_STRING "\r\n");
 
 	while (1)
 	{
